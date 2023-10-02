@@ -10,4 +10,18 @@ import Combine
 
 class RootViewModel: ObservableObject {
     
+    @Published
+    var dataManager: DataManager
+    
+    @Published
+    var tasks: [TaskEntity] = []
+    
+    init(dataManager: DataManager = DataManager.shared) {
+        self.dataManager = dataManager
+        fetchTasks()
+    }
+    
+    private func fetchTasks() {
+        
+    }
 }

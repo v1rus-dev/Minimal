@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct RootView: View {
+    
+    @ObservedObject
+    var viewModel: RootViewModel = RootViewModel()
+    
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+        }
     }
 }
 
 #Preview {
-    RootView()
+    RootView(viewModel: RootViewModel(dataManager: DataManager.preveiw))
 }

@@ -16,17 +16,22 @@ enum DataManagerType {
 
 class DataManager: NSObject, ObservableObject {
     static let shared = DataManager(type: .normal)
-    static let preveiw = DataManager(type: .preview)
+    static let preview = DataManager(type: .preview)
     
     fileprivate var managedObjectContext: NSManagedObjectContext
+    
+    var contex: NSManagedObjectContext {
+        managedObjectContext
+    }
     
     private init(type: DataManagerType) {
         switch type {
         case .normal:
-            let persitanceController = PersistenceController()
+            let persitanceController = PersistenceController.shared
             self.managedObjectContext = persitanceController.container.viewContext
+
         case .preview:
-            let persitanceController = PersistenceController()
+            let persitanceController = PersistenceController.preview
             self.managedObjectContext = persitanceController.container.viewContext
             
             self.managedObjectContext.insertMocData()
@@ -45,5 +50,18 @@ class DataManager: NSObject, ObservableObject {
                 NSLog("Unreolved error saving context: \(error), \(error.userInfo)")
             }
         }
+    }
+}
+
+extension DataManager {
+    func insertTask(text: String, date: Date) {
+        let task = TaskEntity(context: managedObjectContext)
+        task.id = UUID()
+        task.date = date
+        task.text = text
+        task.isDone = false
+        task.timestamp = .now
+        
+        saveData()
     }
 }

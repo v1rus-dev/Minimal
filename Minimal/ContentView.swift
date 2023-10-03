@@ -9,8 +9,6 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    
     var body: some View {
         if #available(iOS 16.0, *) {
             NavigationStack {
@@ -63,5 +61,6 @@ private let itemFormatter: DateFormatter = {
 }()
 
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    @State var dataManager = DataManager.preview
+    return ContentView().environment(\.managedObjectContext, dataManager.contex)
 }

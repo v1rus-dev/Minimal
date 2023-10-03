@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 class RootViewModel: ObservableObject {
     
@@ -18,10 +19,11 @@ class RootViewModel: ObservableObject {
     
     init(dataManager: DataManager = DataManager.shared) {
         self.dataManager = dataManager
-        fetchTasks()
     }
     
-    private func fetchTasks() {
-        
+    func toggleCheckBox(task: TaskEntity) {
+        print("Check toggle")
+        task.isDone.toggle()
+        dataManager.saveData()
     }
 }

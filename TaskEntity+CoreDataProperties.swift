@@ -17,9 +17,10 @@ extension TaskEntity {
     }
 
     @NSManaged public var id: UUID?
-    @NSManaged public var text: String?
+    @NSManaged public var text: String
     @NSManaged public var date: Date?
     @NSManaged public var isDone: Bool
+    @NSManaged public var timestamp: Date?
 
     var isToday: Bool {
         guard let date = date else {

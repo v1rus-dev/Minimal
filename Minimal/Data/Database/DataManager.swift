@@ -57,11 +57,20 @@ extension DataManager {
     func insertTask(text: String, date: Date) {
         let task = TaskEntity(context: managedObjectContext)
         task.id = UUID()
-        task.date = date
+        task.date = date.removeTimeStamp
         task.text = text
         task.isDone = false
         task.timestamp = .now
         
         saveData()
     }
+}
+
+extension Date {
+    public var removeTimeStamp : Date? {
+       guard let date = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: self)) else {
+        return nil
+       }
+       return date
+   }
 }

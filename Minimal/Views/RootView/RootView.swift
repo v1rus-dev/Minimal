@@ -11,23 +11,32 @@ import SwiftUINavigation
 struct RootView: View {
     @ObservedObject
     var viewModel: RootViewModel = .init()
-    
-    @FetchRequest<TaskEntity>(sortDescriptors: [
-        SortDescriptor(\.date, order: .forward),
-        SortDescriptor(\.timestamp, order: .forward)
-    ])
-    private var tasks: FetchedResults<TaskEntity>
-    
+
+    @SectionedFetchRequest(sectionIdentifier: \.date, sortDescriptors: [
+        SortDescriptor(\TaskEntity.date, order: .forward),
+        SortDescriptor(\TaskEntity.isDone, order: .forward),
+        SortDescriptor(\TaskEntity.timestamp, order: .forward)
+    ], animation: .default)
+    private var sectionsDates: SectionedFetchResults<Date?, TaskEntity>
+
     @State
     private var isShowAddTaskView: Bool = false
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                ForEach(tasks, id: \.id) { task in
-                    TaskView(task: task)
+                ForEach(sectionsDates, id: \.id) { section in
+                    if section.id != nil {
+                        Text(section.id!.toText())
+                            .font(.largeTitle)
+                            .bold()
+                        ForEach(section) { task in
+                            TaskView(task: task)
+                        }
+                    }
                 }
             }
+            .padding(.horizontal, 16)
         }
         .environmentObject(viewModel)
         .sheet(isPresented: $isShowAddTaskView, content: {
@@ -53,7 +62,30 @@ struct RootView: View {
 #Preview {
     let dataManager = DataManager.preview
     @ObservedObject
-    var viewModel: RootViewModel = RootViewModel(dataManager: dataManager)
+    var viewModel: RootViewModel = .init(dataManager: dataManager)
     return RootView(viewModel: viewModel)
         .environment(\.managedObjectContext, dataManager.contex)
+}
+
+extension Date {
+    func toText() -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(self) {
+            return "Today"
+        } else if calendar.isDateInTomorrow(self){
+            return "Tomorrow"
+        } else {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            return dateFormatter.string(from: self)
+        }
+    }
+}
+
+extension Date {
+   static var tomorrow: Date { return Date().dayAfter }
+   static var today: Date {return Date()}
+   var dayAfter: Date {
+      return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+   }
 }

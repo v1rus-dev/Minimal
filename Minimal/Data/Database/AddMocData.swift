@@ -22,11 +22,11 @@ extension NSManagedObjectContext {
             task.isDone = i % 2 == 0
             task.timestamp = .now
             if i < 5 {
-                task.date = Date()
+                task.date = Date().removeTimeStamp
             } else {
                 let calendar = Calendar.current
                 let nextDate = calendar.date(byAdding: .day, value: 1, to: Date())
-                task.date = nextDate
+                task.date = nextDate?.removeTimeStamp
             }
         }
     }

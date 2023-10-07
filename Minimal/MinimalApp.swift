@@ -10,10 +10,7 @@ import SwiftUI
 @main
 struct MinimalApp: App {
     let dataManager: DataManager = DataManager.shared
-    
-    init() {
-        removePreviousTasks()
-    }
+    let appViewModel: AppViewModel = AppViewModel.shared
 
     var body: some Scene {
         WindowGroup {

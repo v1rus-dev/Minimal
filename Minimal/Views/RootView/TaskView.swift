@@ -15,15 +15,20 @@ struct TaskView: View {
     
     private var taskIsChecked: Bool = false
     
-    init(task: TaskEntity) {
+    private var onOpenEditScreen: (TaskEntity) -> ()
+    
+    init(task: TaskEntity, onOpenEditScreen: @escaping (TaskEntity) -> () = { _ in}) {
         self.task = task
         self.taskIsChecked = self.task.isDone
+        self.onOpenEditScreen = onOpenEditScreen
     }
     
     var body: some View {
         HStack(spacing: 0) {
             if task.isToday {
-                checkBox
+                CheckButton(task.isDone) {
+                    rootViewModel.toggleCheckBox(task: task)
+                }
             } else {
                 Image(systemName: "circle.fill")
                     .resizable()
@@ -57,6 +62,9 @@ struct TaskView: View {
                 }
             }
             .padding(.leading, 12)
+            .onTapGesture {
+                onOpenEditScreen(task)
+            }
             Spacer()
         }
     }

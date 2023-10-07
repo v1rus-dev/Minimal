@@ -9,9 +9,8 @@ import SwiftUI
 import SwiftUINavigation
 
 struct AddTaskView: View {
-    
     @Environment(\.dismiss) var dismiss
-    
+
     @ObservedObject
     var viewModel: AddTaskViewModel = .init()
     @State
@@ -19,28 +18,35 @@ struct AddTaskView: View {
     @State
     private var date: Date = .now
 
+    @State
+    private var placeholderText = "Text of task"
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Add Task")
                 .font(.largeTitle)
                 .bold()
                 .padding(.top, 10)
+                .padding(.leading, 0)
 
             Text("Text")
                 .font(.title)
                 .bold()
                 .padding(.top, 20)
+                .padding(.leading, 1)
 
-            TextField("Example text of task", text: $text, axis: .vertical)
-                .multilineTextAlignment(.leading)
-                .textFieldStyle(.plain)
-                .padding(.top, 10)
+            NavigationView {
+                VStack(spacing: 0) {
+                    TextEditorView(text: $text, placeHolder: "Text of task")
+                    Spacer()
+                }
+            }
 
             Spacer()
-            
+
             datePart
                 .padding(.top, 20)
-            
+
             Button("Save") {
                 if !text.isEmpty {
                     Task {
@@ -57,7 +63,7 @@ struct AddTaskView: View {
             .padding(.top, 20)
         }
         .frame(alignment: .topLeading)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .navigationTitle("Task")
         .navigationBarTitleDisplayMode(.inline)
     }

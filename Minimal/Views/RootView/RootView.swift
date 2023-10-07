@@ -12,15 +12,29 @@ struct RootView: View {
     @ObservedObject
     var viewModel: RootViewModel = .init()
 
-    @SectionedFetchRequest(sectionIdentifier: \.date, sortDescriptors: [
-        SortDescriptor(\TaskEntity.date, order: .forward),
-        SortDescriptor(\TaskEntity.isDone, order: .forward),
-        SortDescriptor(\TaskEntity.timestamp, order: .forward)
-    ], animation: .default)
+    @SectionedFetchRequest(
+        sectionIdentifier: \.date,
+        sortDescriptors: [
+            SortDescriptor(\TaskEntity.date, order: .forward),
+            SortDescriptor(\TaskEntity.isDone, order: .forward),
+            SortDescriptor(\TaskEntity.timestamp, order: .forward)
+        ],
+        animation: .easeOut
+    )
     private var sectionsDates: SectionedFetchResults<Date?, TaskEntity>
 
     @State
     private var isShowAddTaskView: Bool = false
+    
+    @State
+    private var isShowEditTaskView: TaskEntity? = nil
+
+    @State
+    private var isHideCompleted: Bool = false
+    
+    init(viewModel: RootViewModel = .init()) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         ScrollView {
@@ -31,7 +45,9 @@ struct RootView: View {
                             .font(.largeTitle)
                             .bold()
                         ForEach(section) { task in
-                            TaskView(task: task)
+                            TaskView(task: task) {
+                                isShowEditTaskView = $0
+                            }
                         }
                     }
                 }
@@ -51,10 +67,39 @@ struct RootView: View {
                     }
             }
         })
+        .fullScreenCover(unwrapping: $isShowEditTaskView, content: { task in
+            NavigationView {
+                EditTaskView(taskEntity: task.wrappedValue)
+            }
+        })
         .floatingActionButton(color: .black, image: Image(systemName: "plus").foregroundColor(.white)
             .scaleEffect(1.5))
         {
             isShowAddTaskView.toggle()
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(getHideCompletionTaskButtonText()) {
+                    withAnimation {
+                        isHideCompleted.toggle()
+                    }
+                }
+            }
+        }
+        .onChange(of: isHideCompleted) {
+            if isHideCompleted {
+                sectionsDates.nsPredicate = NSPredicate(format: "isDone == %@", false as NSNumber)
+            } else {
+                sectionsDates.nsPredicate = nil
+            }
+        }
+    }
+    
+    private func getHideCompletionTaskButtonText() -> String {
+        if isHideCompleted {
+            return "Show completed"
+        } else {
+            return "Hide completed"
         }
     }
 }
@@ -63,8 +108,9 @@ struct RootView: View {
     let dataManager = DataManager.preview
     @ObservedObject
     var viewModel: RootViewModel = .init(dataManager: dataManager)
-    return RootView(viewModel: viewModel)
+    return NavigationView { RootView(viewModel: viewModel)
         .environment(\.managedObjectContext, dataManager.contex)
+    }
 }
 
 extension Date {
@@ -72,7 +118,7 @@ extension Date {
         let calendar = Calendar.current
         if calendar.isDateInToday(self) {
             return "Today"
-        } else if calendar.isDateInTomorrow(self){
+        } else if calendar.isDateInTomorrow(self) {
             return "Tomorrow"
         } else {
             let dateFormatter = DateFormatter()
@@ -83,9 +129,15 @@ extension Date {
 }
 
 extension Date {
-   static var tomorrow: Date { return Date().dayAfter }
-   static var today: Date {return Date()}
-   var dayAfter: Date {
-      return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-   }
+    static var tomorrow: Date { return Date().dayAfter }
+    static var today: Date { return Date() }
+    var dayAfter: Date {
+        return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+    }
+}
+
+extension Bool {
+    var string: String {
+         self ? "TRUE" : "FALSE"
+    }
 }

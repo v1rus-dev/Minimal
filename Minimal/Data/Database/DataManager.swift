@@ -74,3 +74,9 @@ extension Date {
        return date
    }
 }
+
+extension NSManagedObject {
+    func cancelChanges() {
+        managedObjectContext?.refresh(self, mergeChanges: false)
+    }
+}

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EditTaskView: View {
-    
     @Environment(\.dismiss) var dismiss
     
     @ObservedObject
@@ -22,6 +21,8 @@ struct EditTaskView: View {
     @State
     private var taskEntity: TaskEntity
     
+    @FocusState var focusState: Bool
+    
     init(taskEntity: TaskEntity, viewModel: EditTaskViewModel = .init()) {
         self.viewModel = viewModel
         _taskEntity = State(initialValue: taskEntity)
@@ -29,7 +30,15 @@ struct EditTaskView: View {
     
     var body: some View {
         VStack {
-            TextEditorView(text: $taskEntity.text, placeHolder: "Text of task")
+            TextField("Text of task", text: $taskEntity.text)
+                .focused($focusState)
+                .onSubmit {
+                    focusState = false
+                }
+                .submitLabel(.done)
+                .padding(.horizontal, 16)
+            
+            Spacer()
         }
         .navigationTitle("Edit task")
         .navigationBarTitleDisplayMode(.inline)
@@ -40,16 +49,14 @@ struct EditTaskView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItemGroup(placement: .secondaryAction) {
                 Button("Save") {
                     if !taskEntity.text.isEmpty {
                         viewModel.dataManager.saveData()
                         dismiss()
                     }
                 }
-            }
-            ToolbarItem(placement: .destructiveAction) {
-                Button("Delete") {
+                Button("Delete", role: .destructive) {
                     self.showConfirmationDeleteDialog = true
                 }
             }
@@ -64,7 +71,6 @@ struct EditTaskView: View {
 }
 
 #Preview {
-    
     @ObservedObject
     var dataManager = DataManager.preview
     let taskEntity = TaskEntity(context: dataManager.contex)
@@ -73,7 +79,6 @@ struct EditTaskView: View {
     taskEntity.timestamp = .now
     taskEntity.id = UUID()
     dataManager.saveData()
-    
     
     return NavigationView { EditTaskView(taskEntity: taskEntity, viewModel: EditTaskViewModel(dataManager: dataManager)) }
 }

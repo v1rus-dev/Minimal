@@ -10,14 +10,8 @@ import CoreData
 
 struct ContentView: View {
     var body: some View {
-        if #available(iOS 16.0, *) {
-            NavigationStack {
-                RootView()
-            }
-        } else {
-            NavigationView {
-                RootView()
-            }
+        AppNavigationView {
+            RootView()
         }
     }
 
@@ -51,6 +45,28 @@ struct ContentView: View {
 //            }
 //        }
 //    }
+}
+
+struct AppNavigationView<Content>: View where Content : View {
+    
+    var content: () -> Content
+    
+    init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+    
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                content()
+            }
+        } else {
+            NavigationView {
+                content()
+            }
+        }
+    }
+    
 }
 
 private let itemFormatter: DateFormatter = {

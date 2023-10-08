@@ -13,6 +13,7 @@ class AppViewModel: ObservableObject {
     private let dataManager = DataManager.shared
     
     private init() {
+        requestNotification()
         processOldTasks()
     }
     
@@ -45,6 +46,16 @@ class AppViewModel: ObservableObject {
             }
         } catch {
             print("Error process old task")
+        }
+    }
+    
+    private func requestNotification() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if let error = error {
+                print("Error get notification: \(error)")
+            }
         }
     }
 }

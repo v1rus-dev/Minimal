@@ -21,6 +21,9 @@ extension TaskEntity {
     @NSManaged public var date: Date?
     @NSManaged public var isDone: Bool
     @NSManaged public var timestamp: Date?
+    @NSManaged public var timeOfNotification: Date?
+    @NSManaged public var notificationEnabled: Bool
+    @NSManaged public var notificationId: UUID?
 
     var isToday: Bool {
         guard let date = date else {

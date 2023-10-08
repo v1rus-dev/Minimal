@@ -34,34 +34,38 @@ struct TaskView: View {
                     .resizable()
                     .frame(width: 10, height: 10)
             }
-            VStack(alignment: .leading, spacing: 0) {
-                if taskIsChecked {
-                    Text(task.text)
-                        .font(Font.custom("SF Pro Text", size: 15)
-                        .weight(.medium))
-                        .strikethrough()
-                        .foregroundStyle(Color(red: 0.45, green: 0.45, blue: 0.45))
-                } else {
-                    Text(task.text)
-                        .font(Font.custom("SF Pro Text", size: 15)
+            HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    if taskIsChecked {
+                        Text(task.text)
+                            .font(Font.custom("SF Pro Text", size: 15)
                             .weight(.medium))
+                            .strikethrough()
+                            .foregroundStyle(Color(red: 0.45, green: 0.45, blue: 0.45))
+                    } else {
+                        Text(task.text)
+                            .font(Font.custom("SF Pro Text", size: 15)
+                                .weight(.medium))
+                    }
+                    if let timestamp = task.timestamp {
+                        Text(timestamp, style: .time)
+                            .font(Font.custom("SF Pro Text", size: 13)
+                                .weight(.medium))
+                            .padding(.top, 5)
+                            .if(!taskIsChecked) { textView in
+                                textView.foregroundStyle(.secondary)
+                            }
+                            .if(taskIsChecked) { textView in
+                                textView
+                                    .strikethrough()
+                                    .foregroundStyle(Color(red: 0.64, green: 0.64, blue: 0.64))
+                            }
+                    }
                 }
-                if let timestamp = task.timestamp {
-                    Text(timestamp, style: .time)
-                        .font(Font.custom("SF Pro Text", size: 13)
-                            .weight(.medium))
-                        .padding(.top, 5)
-                        .if(!taskIsChecked) { textView in
-                            textView.foregroundStyle(.secondary)
-                        }
-                        .if(taskIsChecked) { textView in
-                            textView
-                                .strikethrough()
-                                .foregroundStyle(Color(red: 0.64, green: 0.64, blue: 0.64))
-                        }
-                }
+                Spacer()
             }
             .padding(.leading, 12)
+            .contentShape(Rectangle())
             .onTapGesture {
                 onOpenEditScreen(task)
             }

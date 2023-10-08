@@ -78,10 +78,12 @@ struct RootView: View {
             isShowAddTaskView.toggle()
         }
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button(getHideCompletionTaskButtonText()) {
-                    withAnimation {
-                        isHideCompleted.toggle()
+            if (!sectionsDates.isEmpty) {
+                ToolbarItem(placement: .primaryAction) {
+                    Button(getHideCompletionTaskButtonText()) {
+                        withAnimation {
+                            isHideCompleted.toggle()
+                        }
                     }
                 }
             }

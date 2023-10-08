@@ -54,15 +54,25 @@ class DataManager: NSObject, ObservableObject {
 }
 
 extension DataManager {
-    func insertTask(text: String, date: Date) {
+    func insertTask(text: String, date: Date, isNotifieble: Bool, timeOfNotification: Date) -> UUID? {
         let task = TaskEntity(context: managedObjectContext)
         task.id = UUID()
         task.date = date.removeTimeStamp
         task.text = text
         task.isDone = false
         task.timestamp = .now
+        task.notificationEnabled = isNotifieble
+        task.timeOfNotification = timeOfNotification
+        
+        var notificationId: UUID? = nil
+        
+        if isNotifieble {
+            notificationId = UUID()
+            task.notificationId = notificationId
+        }
         
         saveData()
+        return notificationId
     }
 }
 
